@@ -1,0 +1,34 @@
+---
+- name: Create Ansible Tower Download Location
+  file:
+    path: /root/Ansible_Downloads
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Download Latest Tower Install
+  unarchive:
+    src: https://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz
+    dest: /root/Ansible_Downloads
+    remote_src: yes
+
+- name: Determine Latest Dir
+  command: ls /root/Ansible_Downloads/
+  register: latest_ansible_dir
+
+- name: Update Inventory File
+  template:
+    src: inventory.j2
+    dest: /root/Ansible_Downloads/{{ latest_ansible_dir.stdout }}/inventory
+
+- name: Run Tower Setup
+  command: ./setup.sh
+  args:
+    chdir: /root/Ansible_Downloads/{{ latest_ansible_dir.stdout }}
+
+- name: Output Tower URL
+  debug:
+    msg: 
+    - "https://{{ tower_build_ip }}"
+    - Check Vars for Password

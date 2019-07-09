@@ -1,0 +1,11 @@
+---
+qcow_image: 
+libvirt_path: /var/lib/libvirt/images
+qemu_path: /usr/libexec/qemu-kvm
+password:
+vm_name: 
+vm_domain: 
+vm_cpu: 2
+vm_ram: 8192
+vm_size: 40G
+nameserver: "@192.168.122.1"

@@ -1,0 +1,30 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+
+  tasks:
+
+  - name: Find Stopped VMs
+    virt:
+      command: list_vms
+      state: shutdown
+    register: shutdown_vms
+
+  - name: Gather List
+    debug:
+      msg: "{{ item }}"
+    with_items: "{{ shutdown_vms['list_vms'] }}"
+    register: shutdown_vms_list
+
+  - name: Changing results of List 
+    debug:
+      msg: "{{ item.item }}"
+    with_items: "{{ shutdown_vms_list.results }}"
+
+  - name: Start Running VMs
+    virt:
+      name: "{{ item.item }}"
+      command: start
+    with_items: "{{ shutdown_vms_list.results }}"
