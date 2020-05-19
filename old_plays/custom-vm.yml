@@ -5,7 +5,6 @@
   gather_facts: false
   vars_files:
     - vars.yml
-
   tasks:
 
   - name: Copying Image to libvirt path
@@ -49,18 +48,19 @@
     command: virsh change-media {{ vm_name }} hda /tmp/config.iso --insert 
 
   - pause:
-      seconds: 15
+      seconds: 20
 
   - name: Get IP Address of New VM
     command: dig {{ vm_name }} {{ nameserver }} +short
-    register: new_vm_ipaddr
+    register: vm_ipaddr
 
-  - debug:
-      msg: "New VM IPaddress: {{ new_vm_ipaddr.stdout }}"
+  - name: Output New VM IPaddress
+    debug:
+      msg: "New VM IPaddress: {{ vm_ipaddr.stdout }}"
 
   - name: Set VM IP Address Fact
     set_fact:
-      new_vm_ipaddr: "{{ new_vm_ipaddr.stdout }}"
+      new_vm_ipaddr: "{{ vm_ipaddr.stdout }}"
 
 - hosts: "{{ hostvars['localhost']['new_vm_ipaddr'] }}"
   become: true

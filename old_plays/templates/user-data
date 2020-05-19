@@ -1,5 +1,5 @@
 #cloud-config
-user: mgarris
+user:
 password: "{{ password }}"
 chpasswd: {expire: False}
 ssh_pwauth: True

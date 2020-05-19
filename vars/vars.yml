@@ -1,0 +1,14 @@
+---
+#qcow_image: /home/KVM-Images/rhel-server-7.6-x86_64-kvm.qcow2
+#qcow_image: /home/KVM-Images/rhel-server-7.7-x86_64-kvm.qcow2
+qcow_image: /home/KVM-Images/rhel-8.1-x86_64-kvm.qcow2
+#libvirt_path: /var/lib/libvirt/images
+libvirt_path: /home/VirtualMachines
+qemu_path: /usr/libexec/qemu-kvm
+password: passw0rd
+vm_name: vmname
+vm_domain: something.local
+vm_cpu: 1
+vm_ram: 2048
+vm_size: 10G
+nameserver: "your_name_server_here"

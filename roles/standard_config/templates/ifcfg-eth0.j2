@@ -1,0 +1,7 @@
+BOOTPROTO=none
+DEVICE=eth0
+HWADDR={{ ansible_facts['default_ipv4']['macaddress'] }}
+IPADDR={{ ansible_facts['default_ipv4']['address'] }}
+ONBOOT=yes
+TYPE=Ethernet
+USERCTL=no

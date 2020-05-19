@@ -4,8 +4,7 @@
   become: true
   gather_facts: false
   vars_files:
-  - vars.yml
-
+    - vars/vars.yml
   tasks:
 
   - name: Copying Image to libvirt path
@@ -24,7 +23,7 @@
 
   - name: Copy user-data template to tmp
     template:
-      src: templates/user-data
+      src: templates/user-data-custom
       dest: /tmp/user-data
       owner: root
       group: root
@@ -38,6 +37,7 @@
       name: "{{ vm_name }}"
       command: define
       xml: "{{ lookup('template', 'libvirt-domain.xml.j2') }}"
+    #  xml: "{{ lookup('template', 'libvirt-domain-routed.xml.j2') }}"
       uri: 'qemu:///system'
 
   - name: Start VM
@@ -49,11 +49,33 @@
     command: virsh change-media {{ vm_name }} hda /tmp/config.iso --insert 
 
   - pause:
-      seconds: 15
+      seconds: 20
 
   - name: Get IP Address of New VM
     command: dig {{ vm_name }} {{ nameserver }} +short
-    register: new_vm_ipaddr
+    register: vm_ipaddr
 
-  - debug:
-      msg: "New VM IPaddress: {{ new_vm_ipaddr.stdout }}"
+  - name: Output New VM IPaddress
+    debug:
+      msg: "New VM IPaddress: {{ vm_ipaddr.stdout }}"
+
+  - name: Set VM IP Address Fact
+    set_fact:
+      new_vm_ipaddr: "{{ vm_ipaddr.stdout }}"
+
+  - name: Add Instance to in-memory inventory
+    add_host:
+      hostname: "{{ new_vm_ipaddr }}"
+      groupname: new_vm_build
+
+#- hosts: new_vm_build
+#  become: true
+#  tasks:
+#
+#  - name: Additional Roles
+#    include_role:
+#      name: "{{ item }}"
+#    loop:
+#      - standard_config
+#      - reg_n_packs
+#      - ansible_tower

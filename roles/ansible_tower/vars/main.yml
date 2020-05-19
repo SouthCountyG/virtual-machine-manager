@@ -1,5 +1,5 @@
 ---
-admin_password: 
-pg_password: 
-rabbitmq_password: 
+admin_password: password
+pg_password: password
+rabbitmq_password: password
 tower_build_ip: "{{ hostvars['localhost']['new_vm_ipaddr'] }}"

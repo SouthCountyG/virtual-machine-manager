@@ -1,8 +1,8 @@
 #cloud-config
-user: 
+user: username
 password: "{{ password }}"
 chpasswd: {expire: False }
 ssh_pwauth: True
 disable_root: False
 ssh_authorized_keys:
-  - ssh-rsa xxxxx 
+  - ssh-rsa 

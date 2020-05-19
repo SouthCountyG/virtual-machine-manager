@@ -1,0 +1,59 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+  vars_files:
+  - vars.yml
+
+  tasks:
+
+  - name: Copying Image to libvirt path
+    command: cp {{ qcow_image }} {{ libvirt_path }}/{{vm_name}}.qcow2
+
+  - name: Resizing VM
+    command: qemu-img resize {{ libvirt_path }}/{{ vm_name }}.qcow2 {{ vm_size }}
+  
+  - name: Copy meta-data template to tmp
+    template:
+      src: templates/meta-data
+      dest: /tmp/meta-data
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Copy user-data template to tmp
+    template:
+      src: templates/user-data-custom
+      dest: /tmp/user-data
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Create config
+    command: genisoimage -o /tmp/config.iso -V cidata -r -J /tmp/meta-data /tmp/user-data
+
+  - name: Create VM
+    virt:
+      name: "{{ vm_name }}"
+      command: define
+      xml: "{{ lookup('template', 'libvirt-domain.xml.j2') }}"
+      uri: 'qemu:///system'
+
+  - name: Start VM
+    virt:
+      name: "{{ vm_name }}"
+      state: running
+
+  - name: Add config to VM
+    command: virsh change-media {{ vm_name }} hda /tmp/config.iso --insert 
+
+  - pause:
+      seconds: 15
+
+  - name: Get IP Address of New VM
+    command: dig {{ vm_name }} @192.168.122.1 +short
+    register: new_vm_ipaddr
+
+  - debug:
+      msg: "New VM IPaddress: {{ new_vm_ipaddr.stdout }}"

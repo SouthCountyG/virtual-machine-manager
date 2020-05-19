@@ -32,4 +32,3 @@
     msg: 
     - "https://{{ tower_build_ip }}"
     - Check Vars for Password
-

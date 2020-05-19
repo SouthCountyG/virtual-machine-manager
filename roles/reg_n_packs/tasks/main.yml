@@ -7,15 +7,30 @@
 - name: Subscribe to RHN
   redhat_subscription:
     state: present
-    username:
+    username: username
     password: "{{ registration_password }}"
-    pool_ids:
+    pool_ids: pool
 
-- name: Enable Repos
+- name: Enable Repos RHEL7
   rhsm_repository:
     name:
       - rhel-7-server-optional-rpms
       - rhel-7-server-supplementary-rpms
+    state: enabled
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: Disable Repos RHEL7
+  rhsm_repository:
+    name:
+      - rhel-7-server-htb-rpms
+    state: disabled
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: Enable Repos RHEL8
+  rhsm_repository:
+    name:
+      - rhel-8-for-x86_64-baseos-rpms
+  when: ansible_facts['distribution_major_version'] == "8"
 
 - name: Install Needed Packages
   yum:
